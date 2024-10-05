@@ -1,0 +1,424 @@
+<html>
+ <head>
+  <base href="https://websim.creation.engine/lebonducoin/"/>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   LeBonDuCoin - Achetez et vendez près de chez vous
+  </title>
+  <style>
+   :root {
+    --primary-color: #FF6E14;
+    --secondary-color: #333;
+    --background-color: #f0f0f0;
+    --text-color: #333;
+    --card-background: #fff;
+  }
+
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  header {
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 1em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  nav {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 0.5em;
+  }
+
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  nav ul li {
+    margin: 0 1em;
+  }
+
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+
+  nav ul li a:hover {
+    color: var(--primary-color);
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 2em auto;
+    padding: 1em;
+  }
+
+  .balance {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 1em;
+  }
+
+  .annonce {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1em;
+    margin-bottom: 1em;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+  }
+
+  .annonce:hover {
+    transform: translateY(-5px);
+  }
+
+  .annonce-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1em;
+  }
+
+  .annonce-details {
+    flex-grow: 1;
+  }
+
+  .btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.7em 1.2em;
+    cursor: pointer;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-right: 0.5em;
+  }
+
+  .btn:hover {
+    background-color: #e65c00;
+  }
+
+  .acheter-btn {
+    background-color: #4CAF50;
+  }
+
+  .acheter-btn:hover {
+    background-color: #45a049;
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+  }
+
+  .popup-content {
+    background-color: var(--card-background);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: #000;
+  }
+
+  #image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 10px;
+  }
+
+  .image-upload-label {
+    display: inline-block;
+    padding: 0.7em 1.2em;
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 1em;
+  }
+
+  #image-upload {
+    display: none;
+  }
+  </style>
+ </head>
+ <body>
+  <header>
+   <h1>
+    LeBonDuCoin
+   </h1>
+  </header>
+  <nav>
+   <ul>
+    <li>
+     <a href="/">
+      Accueil
+     </a>
+    </li>
+    <li>
+     <a href="/mes-annonces">
+      Mes Annonces
+     </a>
+    </li>
+    <li>
+     <a href="/profil">
+      Mon Profil
+     </a>
+    </li>
+   </ul>
+  </nav>
+  <main>
+   <div class="balance">
+    Balance:
+    <span id="balance-montant">
+     0
+    </span>
+    €
+   </div>
+   <button class="btn" id="nouvelle-annonce">
+    Poster une nouvelle annonce
+   </button>
+   <button class="btn" id="recharger-balance">
+    Recharger ma balance
+   </button>
+   <button class="btn" id="retirer-argent">
+    Retirer mon argent
+   </button>
+   <h2>
+    Annonces récentes
+   </h2>
+   <div id="liste-annonces">
+    <!-- Les annonces seront ajoutées ici dynamiquement -->
+   </div>
+  </main>
+  <!-- Popup pour nouvelle annonce -->
+  <div class="popup" id="nouvelle-annonce-popup">
+   <div class="popup-content">
+    <span class="close">
+     ×
+    </span>
+    <h2>
+     Poster une nouvelle annonce
+    </h2>
+    <input id="titre-annonce" placeholder="Titre de l'annonce" required="" type="text"/>
+    <textarea id="description-annonce" placeholder="Description de l'annonce" required=""></textarea>
+    <input id="prix-annonce" placeholder="Prix de l'annonce" required="" type="number"/>
+    <label class="image-upload-label" for="image-upload">
+     Choisir une image
+    </label>
+    <input accept="image/*" id="image-upload" type="file"/>
+    <img alt="Aperçu de l'image" id="image-preview" src=""/>
+    <button class="btn" id="poster-annonce">
+     Poster l'annonce
+    </button>
+   </div>
+  </div>
+  <!-- Popup pour recharger la balance -->
+  <div class="popup" id="recharger-balance-popup">
+   <div class="popup-content">
+    <span class="close">
+     ×
+    </span>
+    <h2>
+     Recharger votre balance
+    </h2>
+    <input id="montant-recharge" placeholder="Montant à recharger" required="" type="number"/>
+    <button class="btn" id="confirmer-recharge">
+     Recharger
+    </button>
+   </div>
+  </div>
+  <!-- Popup pour retirer de l'argent -->
+  <div class="popup" id="retirer-argent-popup">
+   <div class="popup-content">
+    <span class="close">
+     ×
+    </span>
+    <h2>
+     Retirer de l'argent
+    </h2>
+    <input id="montant-retrait" placeholder="Montant à retirer" required="" type="number"/>
+    <button class="btn" id="confirmer-retrait">
+     Retirer
+    </button>
+   </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">
+  </script>
+  <script>
+   let balance = 0;
+    const annonces = [];
+    const utilisateurs = {
+      'Utilisateur': { balance: 0 }
+    };
+
+    function afficherAnnonces() {
+      const listeAnnonces = document.getElementById('liste-annonces');
+      listeAnnonces.innerHTML = '';
+      annonces.forEach((annonce, index) => {
+        const annonceElement = document.createElement('div');
+        annonceElement.className = 'annonce';
+        annonceElement.innerHTML = `
+          <img class="annonce-image" src="${annonce.image}" alt="Image de ${annonce.titre}" width="150" height="150">
+          <div class="annonce-details">
+            <h3>${annonce.titre}</h3>
+            <p>${annonce.description}</p>
+            <p>Prix: ${annonce.prix}€</p>
+            <p>Vendeur: ${annonce.vendeur}</p>
+            <button class="btn acheter-btn" data-index="${index}">Acheter</button>
+          </div>
+        `;
+        listeAnnonces.appendChild(annonceElement);
+      });
+
+      document.querySelectorAll('.acheter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = e.target.getAttribute('data-index');
+          acheterAnnonce(index);
+        });
+      });
+    }
+
+    function mettreAJourBalance() {
+      document.getElementById('balance-montant').textContent = balance.toFixed(2);
+    }
+
+    function acheterAnnonce(index) {
+      const annonce = annonces[index];
+      if (balance >= annonce.prix) {
+        balance -= annonce.prix;
+        mettreAJourBalance();
+        utilisateurs[annonce.vendeur].balance += annonce.prix;
+        alert(`Vous avez acheté "${annonce.titre}" pour ${annonce.prix}€.`);
+        annonces.splice(index, 1);
+        afficherAnnonces();
+      } else {
+        alert('Solde insuffisant. Veuillez recharger votre balance.');
+      }
+    }
+
+    // Fonctions pour gérer les popups
+    function ouvrirPopup(id) {
+      document.getElementById(id).style.display = 'block';
+    }
+
+    function fermerPopup(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // Gestionnaires d'événements pour les boutons principaux
+    document.getElementById('nouvelle-annonce').addEventListener('click', () => ouvrirPopup('nouvelle-annonce-popup'));
+    document.getElementById('recharger-balance').addEventListener('click', () => ouvrirPopup('recharger-balance-popup'));
+    document.getElementById('retirer-argent').addEventListener('click', () => ouvrirPopup('retirer-argent-popup'));
+
+    // Fermer les popups
+    document.querySelectorAll('.close').forEach(closeBtn => {
+      closeBtn.addEventListener('click', () => {
+        closeBtn.closest('.popup').style.display = 'none';
+      });
+    });
+
+    // Gérer l'upload et l'aperçu de l'image
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        document.getElementById('image-preview').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Poster une nouvelle annonce
+    document.getElementById('poster-annonce').addEventListener('click', () => {
+      const titre = document.getElementById('titre-annonce').value;
+      const description = document.getElementById('description-annonce').value;
+      const prix = parseFloat(document.getElementById('prix-annonce').value);
+      const image = document.getElementById('image-preview').src;
+      const vendeur = 'Utilisateur'; // À remplacer par le nom d'utilisateur réel
+
+      if (titre && description && !isNaN(prix) && image) {
+        annonces.push({ titre, description, prix, vendeur, image });
+        afficherAnnonces();
+        fermerPopup('nouvelle-annonce-popup');
+        // Réinitialiser le formulaire
+        document.getElementById('titre-annonce').value = '';
+        document.getElementById('description-annonce').value = '';
+        document.getElementById('prix-annonce').value = '';
+        document.getElementById('image-preview').src = '';
+      } else {
+        alert('Veuillez remplir tous les champs correctement.');
+      }
+    });
+
+    // Recharger la balance
+    document.getElementById('confirmer-recharge').addEventListener('click', () => {
+      const montant = parseFloat(document.getElementById('montant-recharge').value);
+      if (!isNaN(montant) && montant > 0) {
+        balance += montant;
+        mettreAJourBalance();
+        alert(`Votre balance a été rechargée de ${montant}€.`);
+        fermerPopup('recharger-balance-popup');
+        document.getElementById('montant-recharge').value = '';
+      } else {
+        alert('Veuillez entrer un montant valide.');
+      }
+    });
+
+    // Retirer de l'argent
+    document.getElementById('confirmer-retrait').addEventListener('click', () => {
+      const montant = parseFloat(document.getElementById('montant-retrait').value);
+      if (!isNaN(montant) && montant > 0 && montant <= balance) {
+        balance -= montant;
+        mettreAJourBalance();
+        alert(`Vous avez retiré ${montant}€ de votre balance.`);
+        fermerPopup('retirer-argent-popup');
+        document.getElementById('montant-retrait').value = '';
+      } else {
+        alert('Montant invalide ou solde insuffisant.');
+      }
+    });
+
+    // Initialisation
+    afficherAnnonces();
+    mettreAJourBalance();
+  </script>
+ </body>
+</html>
